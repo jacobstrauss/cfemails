@@ -1,0 +1,135 @@
+<!--
+
+  Clinton Foundation Gala 2015 Lightbox
+
+  Instructions:
+  * HTML and JS go anywhere on page, though preferably towards the bottom
+  * The HTML can be edited to switch the donation form link
+  * Images can be changed via the first few lines of JS
+  * Lightbox display frequency can be changed by editing the displayFrequencyInDays
+    javascript variable. The value of the variable should be an integer representing
+    the number of days the lightbox should be supressed after it loads. Example:
+      * 0 = display every visit
+      * 1 = display every 1 days
+      * 2 = display every 2 days
+
+-->
+<div style="display: none;">
+  <div class="cf-hp-lightbox">
+    <a href="https://re.clintonfoundation.org/sslpage.aspx?pid=4782">
+      <img src="https://www.clintonfoundation.org/sites/default/files/matchinggift_desktop_v2.jpg" />
+    </a>
+  </div>
+</div>
+
+<script>
+  (function($){
+
+    //  Editable Variables
+    var lightboxClass = "cf-hp-lightbox",  // must match class in lightbox HTML
+        desktopImage = {
+          width: "700px",
+          height: "400px",
+          url: "https://www.clintonfoundation.org/sites/default/files/matchinggift_desktop_v2.jpg"
+        },
+        mobileImage = {
+          width: "350px",
+          height: "600px",
+          url: "https://www.clintonfoundation.org/sites/default/files/matchinggift_mobile_v2.jpg"
+        },
+        displayFrequencyInDays = 1;  //  how often lightbox should show in days. 0 = every visit, 1 = ever day, 2 = ever two days, etc...
+
+    //  Required Variables
+    var resizeTimer,
+        createCookie,
+        readCookie,
+        $lightbox,
+        $lightboxStyles,
+        lightboxStylesHTML;
+
+    //  Generic cookie functions
+    createCookie = function (name, value, days) {
+      var date,
+          expires;
+
+      if(days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      }
+      else {
+        expires = "";
+      }
+      document.cookie = name + "=" + value + expires + "; path=/";
+    };
+    readCookie = function (name) {
+      var nameEQ,
+          ca,
+          c,
+          i;
+      
+      nameEQ = name + "=";
+      ca = document.cookie.split(';');
+      for(i = 0; i < ca.length; i++) {
+        c = ca[i];
+        while(c.charAt(0) == ' ') {
+          c = c.substring(1, c.length);
+        }
+        if(c.indexOf(nameEQ) == 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+      }
+      return null;
+    };
+
+    //  Change image to mobile / desktop depending on screen size
+    $lightbox = $( "." + lightboxClass );
+    if( window.outerWidth > 700 ) {
+      $("img", $lightbox).attr( "src", desktopImage.url ).attr( "width", desktopImage.width ).attr( "height", desktopImage.height );
+      $lightbox.css({
+        "height": desktopImage.height,
+        "width": desktopImage.width,
+        "overflow": "hidden"
+      });
+    }
+    else {
+      $("img", $lightbox).attr( "src", mobileImage.url ).attr( "width", mobileImage.width ).attr( "height", mobileImage.height );
+      $lightbox.css({
+        "max-height": "100%",
+        "max-width": "100%",
+        "height": mobileImage.height,
+        "width": mobileImage.width,
+        "overflow": "hidden"
+      });
+    }
+
+    //  Lightbox styles
+    $lightbox.css( { "text-align": "center" } );
+    $("img", $lightbox).css({
+      "width": "auto",
+      "max-width": "100%",
+      "height": "auto",
+      "max-height": "100%"
+    });
+
+    //  Launch lightbox
+    $(document).ready(function() {
+      if( readCookie("lightboxDisplay") != "Y" ) {
+
+        $.colorbox({
+          maxWidth: '95%',
+          maxHeight: '95%',
+          inline: true,
+          href: $lightbox,
+          loop: false
+        });
+
+        if( displayFrequencyInDays ) {
+          createCookie("lightboxDisplay", "Y", displayFrequencyInDays);
+        }
+
+      }
+    });
+
+  })(jQuery);
+</script>
